@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+      target: prod
+    image: poc:${POC_VERSION:-latest}
+    restart: always
+    env_file:
+    - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POC_HOST: 0.0.0.0
+      POC_DB_HOST: poc-db
+      POC_DB_PORT: 5432
+      POC_DB_USER: poc
+      POC_DB_PASS: poc
+      POC_DB_BASE: poc
+
+  db:
+    image: postgres:13.8-bullseye
+    hostname: poc-db
+    environment:
+      POSTGRES_PASSWORD: "poc"
+      POSTGRES_USER: "poc"
+      POSTGRES_DB: "poc"
+    volumes:
+    - poc-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U poc
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+
+
+volumes:
+  poc-db-data:
+    name: poc-db-data
