@@ -2,6 +2,9 @@ from typing import Awaitable, Callable
 
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 
 from poc.db.meta import meta
 from poc.db.models import load_all_models
@@ -19,12 +22,24 @@ def _setup_db(app: FastAPI) -> None:  # pragma: no cover
     :param app: fastAPI application.
     """
     engine = create_async_engine(str(settings.db_url), echo=settings.db_echo)
+    sync_engine = engine = create_engine(str(settings.db_url_sync), echo=settings.db_echo)
+
     session_factory = async_sessionmaker(
         engine,
         expire_on_commit=False,
     )
+
+    sync_session_factory = sessionmaker(
+        expire_on_commit=False,
+        autocommit=False,
+        autoflush=False,
+        bind=sync_engine
+    )
     app.state.db_engine = engine
+    app.state.sync_db_engine = sync_engine
+
     app.state.db_session_factory = session_factory
+    app.state.sync_db_session_factory = sync_session_factory
 
 
 async def _create_tables() -> None:  # pragma: no cover

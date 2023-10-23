@@ -2,9 +2,10 @@ import enum
 from pathlib import Path
 from tempfile import gettempdir
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+import pydantic
+#from pydantic_settings import BaseSettings, SettingsConfigDict
 from yarl import URL
-
+from pydantic import BaseModel
 TEMP_DIR = Path(gettempdir())
 
 
@@ -19,7 +20,7 @@ class LogLevel(str, enum.Enum):  # noqa: WPS600
     FATAL = "FATAL"
 
 
-class Settings(BaseSettings):
+class Settings(pydantic.BaseSettings):
     """
     Application settings.
 
@@ -27,24 +28,36 @@ class Settings(BaseSettings):
     with environment variables.
     """
 
-    host: str = "127.0.0.1"
+    host: str = "0.0.0.0"
     port: int = 8000
     # quantity of workers for uvicorn
     workers_count: int = 1
     # Enable uvicorn reloading
-    reload: bool = False
+    reload: bool = True
 
     # Current environment
     environment: str = "dev"
 
     log_level: LogLevel = LogLevel.INFO
     # Variables for the database
-    db_host: str = "localhost"
+    db_host: str = "poc-db"
     db_port: int = 5432
     db_user: str = "poc"
     db_pass: str = "poc"
     db_base: str = "poc"
-    db_echo: bool = False
+    db_echo: bool = True
+
+    @property
+    def db_url_sync(self) -> URL:
+        return URL.build(
+            scheme="postgresql+psycopg",
+            host=self.db_host,
+            port=self.db_port,
+            user=self.db_user,
+            password=self.db_pass,
+            path=f"/{self.db_base}",
+        )
+
 
     @property
     def db_url(self) -> URL:
@@ -62,11 +75,11 @@ class Settings(BaseSettings):
             path=f"/{self.db_base}",
         )
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_prefix="POC_",
-        env_file_encoding="utf-8",
-    )
+    # model_config = SettingsConfigDict(
+    #     env_file=".env",
+    #     env_prefix="POC_",
+    #     env_file_encoding="utf-8",
+    # )
 
 
 settings = Settings()

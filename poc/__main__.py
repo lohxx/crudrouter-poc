@@ -28,6 +28,7 @@ def main() -> None:
             factory=True,
             accesslog="-",
             loglevel=settings.log_level.value.lower(),
+            reload=settings.reload,
             access_log_format='%r "-" %s "-" %Tf',  # noqa: WPS323
         ).run()
 

@@ -20,6 +20,8 @@ services:
       POC_DB_USER: poc
       POC_DB_PASS: poc
       POC_DB_BASE: poc
+    ports:
+      - 8000:8000
 
   db:
     image: postgres:13.8-bullseye
@@ -36,6 +38,8 @@ services:
       interval: 2s
       timeout: 3s
       retries: 40
+    ports:
+      - 5433:5432
 
 
 
