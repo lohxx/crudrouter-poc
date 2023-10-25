@@ -8,8 +8,8 @@ services:
       target: prod
     image: poc:${POC_VERSION:-latest}
     restart: always
-    env_file:
-    - .env
+    # env_file:
+    # - .env
     depends_on:
       db:
         condition: service_healthy
@@ -22,6 +22,8 @@ services:
       POC_DB_BASE: poc
     ports:
       - 8000:8000
+    volumes:
+      - .:/app/src
 
   db:
     image: postgres:13.8-bullseye

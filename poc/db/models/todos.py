@@ -1,21 +1,19 @@
 from __future__ import annotations
+import enum
 from typing import List
 
-import enum
 from sqlalchemy import Column, String, Enum, Integer, Date, DateTime
-
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 from sqlalchemy import text
-
 from sqlalchemy.orm import declarative_base
+
+from poc.db.meta import meta
 
 Base = declarative_base()
 
-
-#from poc.db.base import Base
 
 class TaskStatus(str, enum.Enum):
     pending = 'pending'
@@ -23,6 +21,7 @@ class TaskStatus(str, enum.Enum):
 
 
 class Project(Base):
+    metadata = meta
     __tablename__ = 'project'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
@@ -32,6 +31,7 @@ class Project(Base):
 
 
 class Task(Base):
+    metadata = meta
     __tablename__ = 'task'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
@@ -39,4 +39,5 @@ class Task(Base):
     status = Column(Enum(TaskStatus))
     project_id = Column(Integer, ForeignKey("project.id"), nullable=True)
 
-    
+    def as_dict(self) -> dict:
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
