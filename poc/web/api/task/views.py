@@ -2,11 +2,10 @@ from typing import List, Optional
 
 from fastapi import Request, Depends
 from fastapi_crudrouter import SQLAlchemyCRUDRouter
-from fastapi_crudrouter.core.databases import pydantify_record
 
 from poc.db.models.todos import Task, TaskStatus
 from poc.db.dependencies import sync_db_session
-from poc.db.utils import get_all_tasks
+from poc.db.utils import get_all_tasks, update_task as update_task_db
 from poc.web.api.task.schema import Task as TaskSchema, PersistedTask
 
 
@@ -20,10 +19,14 @@ router = SQLAlchemyCRUDRouter(
 )
 
 
-@router.api_route('/{item}', methods=['PATCH'])
-def update_task(body: TaskSchema) -> PersistedTask:
-    print(dir(body))
-    return True
+@router.api_route('/{item_id}', methods=['PATCH'])
+def update_task(
+    item_id: int,
+    body: TaskSchema,
+    db_session=Depends(sync_db_session)) -> PersistedTask:
+    task = update_task_db(db_session, item_id, body)
+
+    return PersistedTask(**task.as_dict())
 
 
 @router.get('')

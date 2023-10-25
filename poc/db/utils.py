@@ -4,6 +4,8 @@ from sqlalchemy import text, select
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import create_async_engine
 
+from fastapi import HTTPException
+
 from poc.db.filters import EqFilter, GteFilter, LtFilter, NeFilter, InFilter
 from poc.db.filters import FilterNotSupported, OPERATORS
 
@@ -67,3 +69,20 @@ def get_all_tasks(db_session, model, page=1, per_page=20, extra_filters=None):
 
     query = query.limit(per_page).offset((page - 1) * per_page)
     return db_session.execute(query).all()
+
+
+def update_task(db_session, task_id, task):
+    task_db = db_session.query(todos.Task).filter(todos.Task.id == task_id).first()
+    if not task_db:
+        raise HTTPException(status_code=404, detail="Task não encontrada")
+
+    for k, v in task.dict().items():
+        setattr(task_db, k, v)
+
+    try:
+        db_session.add(task_db)
+        db_session.commit()
+        return task_db
+    except Exception as e:
+        db_session.rollback()
+        raise e
