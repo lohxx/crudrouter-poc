@@ -52,7 +52,7 @@ async def drop_database() -> None:
 
 
 
-def get_all_tasks(db_session, model, page=1, per_page=20, extra_filters=None):
+def get_all_entities(db_session, model, page=1, per_page=20, extra_filters=None):
     query = db_session.query(model)
     if extra_filters:
         extra_filters = json.loads(extra_filters)
@@ -67,11 +67,11 @@ def get_all_tasks(db_session, model, page=1, per_page=20, extra_filters=None):
                 operator = OPERATORS['$eq']()
                 query = query.filter(text(f"{k} {str(operator)} {operator.converter(value)}"))
 
-    query = query.limit(per_page).offset((page - 1) * per_page)
-    return db_session.execute(query).all()
+    query = query.limit(per_page).offset((page - 1) * per_page).all()
+    return query
 
 
-def update_task(db_session, task_id, task):
+def update_entity(db_session, task_id, task):
     task_db = db_session.query(todos.Task).filter(todos.Task.id == task_id).first()
     if not task_db:
         raise HTTPException(status_code=404, detail="Task não encontrada")

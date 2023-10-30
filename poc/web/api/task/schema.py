@@ -3,7 +3,7 @@ from datetime import date, datetime
 from pydantic import BaseModel, Field
 
 from poc.db.models.todos import TaskStatus
-
+from poc.web.api import OrmBase
 
 class Task(BaseModel):
     name: str
@@ -12,8 +12,5 @@ class Task(BaseModel):
     status: TaskStatus = Field(default=TaskStatus.pending.value)
 
 
-class PersistedTask(Task):
-    id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
+class PersistedTask(Task, OrmBase):
+    pass

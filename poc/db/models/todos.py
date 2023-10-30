@@ -27,7 +27,8 @@ class Project(Base):
     name = Column(String)
     due_date = Column(Date)
     created_at = Column(DateTime, server_default=text('NOW()'))
-    task: Mapped[List["Task"]] = relationship("Task")
+    tasks: Mapped[List["Task"]] = relationship("Task", lazy="dynamic")
+
 
 
 class Task(Base):
@@ -38,6 +39,3 @@ class Task(Base):
     created_at = Column(DateTime, server_default=text('NOW()'))
     status = Column(Enum(TaskStatus))
     project_id = Column(Integer, ForeignKey("project.id"), nullable=True)
-
-    def as_dict(self) -> dict:
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
