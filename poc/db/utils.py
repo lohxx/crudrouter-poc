@@ -71,18 +71,18 @@ def get_all_entities(db_session, model, page=1, per_page=20, extra_filters=None)
     return query
 
 
-def update_entity(db_session, task_id, task):
-    task_db = db_session.query(todos.Task).filter(todos.Task.id == task_id).first()
-    if not task_db:
+def update_entity(db_session, entity_id, body, model):
+    entity = db_session.query(model).filter(getattr(model, 'id') == entity_id).first()
+    if not entity:
         raise HTTPException(status_code=404, detail="Task não encontrada")
 
-    for k, v in task.dict().items():
-        setattr(task_db, k, v)
+    for k, v in body.dict().items():
+        setattr(entity, k, v)
 
     try:
-        db_session.add(task_db)
+        db_session.add(entity)
         db_session.commit()
-        return task_db
+        return entity
     except Exception as e:
         db_session.rollback()
         raise e

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Query
 from poc.db.dependencies import sync_db_session
 from poc.db.utils import get_all_entities, update_entity as update_entity_db
 
+
 class OrmBase(BaseModel):
     # Common properties across orm models
     id: int
@@ -22,7 +23,6 @@ class OrmBase(BaseModel):
 
     class Config:
         orm_mode = True
-
 
 
 
@@ -55,9 +55,9 @@ def create_router(schema: BaseModel, create_schema: BaseModel, model, prefix: st
         item_id: int,
         body: create_schema,
         db_session=Depends(sync_db_session)) -> schema:
-        task = update_entity_db(db_session, item_id, body)
+        task = update_entity_db(db_session, item_id, body, model)
 
-        return schema(**task.as_dict())
+        return schema.from_orm(task)
 
 
     @router.get('')
