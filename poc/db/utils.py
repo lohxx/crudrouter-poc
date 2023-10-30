@@ -65,7 +65,7 @@ def get_all_entities(db_session, model, page=1, per_page=20, extra_filters=None)
                     query = query.filter(text(f"{k} {str(operator)} {operator.converter(value)}"))
             else:
                 operator = OPERATORS['$eq']()
-                query = query.filter(text(f"{k} {str(operator)} {operator.converter(value)}"))
+                query = query.filter(text(f"{k} {str(operator)} {operator.converter(v)}"))
 
     query = query.limit(per_page).offset((page - 1) * per_page).all()
     return query

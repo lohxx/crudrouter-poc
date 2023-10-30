@@ -61,15 +61,17 @@ class InFilter(BaseFilter):
         return 'IN'
     
     def converter(self, value):
+        if not value:
+            return '()'
         if type(value) == list:
-            join_str = ''
+            join_str = []
             for item in value:
                 if type(item) == str:
-                    join_str += f"'{item}',"
+                    join_str.append(f"'{item}'")
                 else:
-                    join_str += f"{item},"
+                    join_str.append(f"{item}")
 
-            return f"({join_str})"
+            return f"({','.join(join_str)})"
 
         elif type(value) == str:
             return f"({value})"

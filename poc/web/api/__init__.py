@@ -68,8 +68,6 @@ def create_router(schema: BaseModel, create_schema: BaseModel, model, prefix: st
         db_session=Depends(sync_db_session),
     ) -> Optional[List[schema]]:
         entities = get_all_entities(db_session, model, page, per_page, extra_filters=where)
-
-        print(dir(entities[0]))
         return [schema.from_orm(entity) for entity in entities]
 
     return router
