@@ -76,7 +76,7 @@ def update_entity(db_session, entity_id, body, model):
     if not entity:
         raise HTTPException(status_code=404, detail="Task não encontrada")
 
-    for k, v in body.dict().items():
+    for k, v in body.dict(exclude_unset=True).items():
         setattr(entity, k, v)
 
     try:

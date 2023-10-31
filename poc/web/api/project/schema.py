@@ -14,3 +14,8 @@ class Project(BaseModel):
 
 class PersistedProject(Project, OrmBase):
     tasks: List[PersistedTask] = []
+
+
+class PartialProject(Project):
+    name: Optional[str] = None
+    created_at: Optional[datetime] = None
