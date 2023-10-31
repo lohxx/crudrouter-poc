@@ -74,7 +74,7 @@ def get_all_entities(db_session, model, page=1, per_page=20, extra_filters=None)
 def update_entity(db_session, entity_id, body, model):
     entity = db_session.query(model).filter(getattr(model, 'id') == entity_id).first()
     if not entity:
-        raise HTTPException(status_code=404, detail="Task não encontrada")
+        raise HTTPException(status_code=404, detail=f"{model.__name__} não encontrada")
 
     for k, v in body.dict(exclude_unset=True).items():
         setattr(entity, k, v)
