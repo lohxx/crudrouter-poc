@@ -79,6 +79,17 @@ class InFilter(BaseFilter):
         return f'({value})'
     
 
+class BetweenFilter(BaseFilter):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    
+    def __repr__(self):
+        return 'BETWEEN'
+    
+    def converter(self, value):
+        min, max = value
+        return f"'{min}' AND '{max}'"
+
 class FilterNotSupported(Exception):
     pass
 
@@ -89,4 +100,5 @@ OPERATORS = {
     '$ne': NeFilter,
     '$in': InFilter,
     '$gte': GteFilter,
+    '$between': BetweenFilter,
 }

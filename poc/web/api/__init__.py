@@ -48,7 +48,8 @@ def create_router(schema: BaseModel, create_schema: BaseModel, model, prefix: st
 
     router = SQLAlchemyCRUDRouter(
         schema=schema,
-        create_schema=create_schema, 
+        create_schema=create_schema,
+        update_schema=partial_model,
         db_model=model,
         db=db,
         prefix=prefix,
